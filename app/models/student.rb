@@ -1,6 +1,34 @@
 require_relative '../../db/config'
 
+class AgeValidator < ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    unless record.age > 5
+      record.errors[attribute] << (options[:message] || "isn't over 5 years old.")
+    end
+  end
+end
+
+class PhoneValidator < ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    unless value =~ /(\d{3})-(\d{3})-(\d{4})/
+      record.errors[attribute] << (options[:message] || "is not a valid phone")
+    end
+  end
+end
+
+class EmailValidator < ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    unless value =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+      record.errors[attribute] << (options[:message] || "is not an email")
+    end
+  end
+end
+
 class Student < ActiveRecord::Base
+  validates :email, :uniqueness => true
+  # validates :phone, :phone => true
+  validates :birthday, :age => true
+  validates :email, :email => true
 
   def name
     "#{first_name} #{last_name}"
@@ -8,7 +36,7 @@ class Student < ActiveRecord::Base
 
   def age
     now = Date.today
-    now.year - birthday.year - ((now.month > birthday.month || (now.month == birthday.month && now.day >= birthday.day)) ? 0 : 1)
+    age = now.year - birthday.year - ((now.month > birthday.month || (now.month == birthday.month && now.day >= birthday.day)) ? 0 : 1)
   end
 end
 
