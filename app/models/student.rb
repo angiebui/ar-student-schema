@@ -10,7 +10,7 @@ end
 
 class PhoneValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    unless value =~ /(\d{3})-(\d{3})-(\d{4})/
+    unless record.phone.scan(/\d/).count >= 10
       record.errors[attribute] << (options[:message] || "is not a valid phone")
     end
   end
@@ -18,17 +18,16 @@ end
 
 class EmailValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    unless value =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+    unless record.email =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
       record.errors[attribute] << (options[:message] || "is not an email")
     end
   end
 end
 
 class Student < ActiveRecord::Base
-  validates :email, :uniqueness => true
-  # validates :phone, :phone => true
+  validates :email, :uniqueness => true, :email => true
+  validates :phone, :phone => true
   validates :birthday, :age => true
-  validates :email, :email => true
 
   def name
     "#{first_name} #{last_name}"
