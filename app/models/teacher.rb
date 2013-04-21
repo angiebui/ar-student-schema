@@ -16,9 +16,12 @@ class EmailValidator < ActiveModel::EachValidator
   end
 end
 
+
+
+
 class Teacher < ActiveRecord::Base
-  has_many :students, :through => :students_teachers
-  has_many :students_teachers
+  has_many :students, :through => :student_teachers
+  has_many :student_teachers
 
   validates :email, :uniqueness => true, :email => true
   validates :phone, :phone => true
